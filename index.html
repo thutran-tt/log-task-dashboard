@@ -647,16 +647,18 @@
       const [tempFieldPlaceholder, setTempFieldPlaceholder] = useState("");
 
       const [newUserName, setNewUserName] = useState("");
-      const [newUserRole, setNewUserRole] = useState("Martech Engineer");
+      const [newUserRole, setNewUserRole] = useState("");
       const [newUserEmail, setNewUserEmail] = useState("");
 
       const handleAddUser = (e) => {
         e.preventDefault();
         if (!newUserName.trim()) { triggerToast("Tên nhân sự không được để trống!", "error"); return; }
+        if (!newUserRole.trim()) { triggerToast("Vai trò không được để trống!", "error"); return; }
         const newId = `U${String(users.length + 1).padStart(2, '0')}`;
         const newUser = { id: newId, name: newUserName, role: newUserRole, email: newUserEmail };
         setUsers([...users, newUser]);
         setNewUserName("");
+        setNewUserRole("");
         setNewUserEmail("");
         triggerToast(`Đã thêm nhân sự mới: ${newUserName}`);
       };
@@ -1400,9 +1402,7 @@
                       <div><label className="block text-xs text-gray-500 mb-1.5 font-medium uppercase tracking-wider">Họ và Tên</label><input type="text" placeholder="VD: Nguyen Van A" required value={newUserName} onChange={(e) => setNewUserName(e.target.value)} className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900" /></div>
                       <div>
                         <label className="block text-xs text-gray-500 mb-1.5 font-medium uppercase tracking-wider">Vai trò (Role)</label>
-                        <select value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)} className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900 cursor-pointer">
-                          <option value="Project Manager">Project Manager</option><option value="Tech Lead">Tech Lead</option><option value="Martech Engineer">Martech Engineer</option><option value="Data Analyst">Data Analyst</option><option value="Solution Architect">Solution Architect</option><option value="Account Executive">Account Executive</option><option value="UI/UX Designer">UI/UX Designer</option><option value="Media Buyer">Media Buyer</option><option value="SEO Specialist">SEO Specialist</option>
-                        </select>
+                        <input type="text" placeholder="VD: Martech Engineer" required value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)} className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900" />
                       </div>
                       <div><label className="block text-xs text-gray-500 mb-1.5 font-medium uppercase tracking-wider">Email liên hệ (Tùy chọn)</label><input type="email" placeholder="VD: a.nguyen@martech.vn" value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900" /></div>
                       <button type="submit" className="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"><Plus className="w-4 h-4" /> Khởi Tạo Nhân Sự</button>
