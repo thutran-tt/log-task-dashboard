@@ -949,7 +949,12 @@
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1">Dự Án</label>
-                    <select required value={editingLog.projectId} onChange={e => setEditingLog({...editingLog, projectId: e.target.value, service: ''})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900">
+                    <select required value={editingLog.projectId} onChange={e => {
+                        const pid = e.target.value;
+                        const pObj = projects.find(p => p.id === pid);
+                        const autoSrv = (pObj && pObj.services && pObj.services.length > 0) ? services[pObj.services[0]] : '';
+                        setEditingLog({...editingLog, projectId: pid, service: autoSrv});
+                    }} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900">
                       <option value="">-- Chọn dự án --</option>
                       {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                     </select>
@@ -1411,7 +1416,16 @@
                             <tr key={index} className="hover:bg-gray-50 transition-colors">
                               <td className="py-3 px-1 text-center"><span className="text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded w-full block truncate">{selectedProjObj ? selectedProjObj.bu : "-"}</span></td>
                               <td className="py-3 px-1">
-                                <select value={row.projectId} onChange={(e) => { handleTrackerValueChange(index, 'projectId', e.target.value); handleTrackerValueChange(index, 'serviceName', ''); }} className="w-full text-xs px-2 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 cursor-pointer">
+                                <select value={row.projectId} onChange={(e) => { 
+                                  const pid = e.target.value;
+                                  handleTrackerValueChange(index, 'projectId', pid); 
+                                  const pObj = projects.find(p => p.id === pid);
+                                  if (pObj && pObj.services && pObj.services.length > 0) {
+                                    handleTrackerValueChange(index, 'serviceName', services[pObj.services[0]]);
+                                  } else {
+                                    handleTrackerValueChange(index, 'serviceName', '');
+                                  }
+                                }} className="w-full text-xs px-2 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 cursor-pointer">
                                   <option value="">-- Chọn dự án --</option>
                                   {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                                 </select>
