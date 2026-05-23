@@ -196,42 +196,44 @@
       const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
       // State quản lý việc lưu trữ đám mây
-      const [user, setUser] = useState(null);
       const [db, setDb] = useState(null);
       const [isLoadingData, setIsLoadingData] = useState(true);
 
-      // Khởi tạo kết nối máy chủ
+      // CẤU HÌNH FIREBASE DÀNH RIÊNG CHO AKA MARTECH DASHBOARD
+      const FIREBASE_CONFIG = {
+        apiKey: "AIzaSyArNvMpd91IKomlORdwV2jHT7d-EJV8WrA",
+        authDomain: "aka-martech-dashboard.firebaseapp.com",
+        projectId: "aka-martech-dashboard",
+        storageBucket: "aka-martech-dashboard.firebasestorage.app",
+        messagingSenderId: "914269480094",
+        appId: "1:914269480094:web:49298e1ceb52a9ffe9478f",
+        measurementId: "G-Y852Z5QF06"
+      };
+
+      // Khởi tạo kết nối máy chủ dùng chung cho TEAM
       useEffect(() => {
         const initFirebase = async () => {
           if (!window.FirebaseLib) return;
-          const { initializeApp, getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, getFirestore } = window.FirebaseLib;
+          const { initializeApp, getAuth, signInAnonymously, getFirestore } = window.FirebaseLib;
           
           try {
-            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-            if (!firebaseConfig) {
-               console.warn("Không tìm thấy kết nối đám mây. Ứng dụng chạy bằng bộ nhớ tạm.");
-               setIsLoadingData(false);
-               return;
-            }
-
-            const app = initializeApp(firebaseConfig);
+            const app = initializeApp(FIREBASE_CONFIG);
             const auth = getAuth(app);
             const database = getFirestore(app);
             setDb(database);
 
-            const initAuth = async () => {
-              if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-              } else {
-                await signInAnonymously(auth);
-              }
-            };
-            await initAuth();
-
-            onAuthStateChanged(auth, setUser);
+            // Bọc đăng nhập ẩn danh vào try...catch riêng
+            // Đảm bảo dù chưa kích hoạt Authentication trên Firebase Console thì ứng dụng vẫn chạy tiếp (Firestore Test Mode không cần Auth)
+            try {
+              await signInAnonymously(auth);
+            } catch (authErr) {
+              console.warn("Tính năng Anonymous Auth chưa bật. Sử dụng CSDL không cần đăng nhập.");
+            }
           } catch (err) {
-            console.error("Lỗi khởi tạo kết nối:", err);
-            setIsLoadingData(false);
+            console.error("Lỗi kết nối Firebase:", err);
+          } finally {
+            // Trường hợp lỗi kết nối hoàn toàn thì giải phóng màn hình chờ sau 3 giây
+            setTimeout(() => setIsLoadingData(false), 3000);
           }
         };
 
@@ -243,13 +245,13 @@
         return () => window.removeEventListener('firebase-loaded', initFirebase);
       }, []);
 
-      // Tự động tải dữ liệu của bạn từ đám mây (Realtime)
+      // Tự động tải dữ liệu CHUNG CỦA TOÀN TEAM từ đám mây (Realtime)
       useEffect(() => {
-        if (!user || !db) return;
+        if (!db) return;
         const { doc, onSnapshot } = window.FirebaseLib;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         
-        const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'workspace', 'data');
+        // TẤT CẢ mọi người truy cập cùng 1 Document chung mang tên 'team_workspace'
+        const docRef = doc(db, 'aka_agency', 'team_workspace');
         
         const unsubscribe = onSnapshot(docRef, (docSnap) => {
            if (docSnap.exists()) {
@@ -266,14 +268,13 @@
         });
 
         return () => unsubscribe();
-      }, [user, db]);
+      }, [db]);
 
-      // Hàm gửi dữ liệu lên đám mây khi có thay đổi
+      // Hàm gửi dữ liệu lên đám mây (Khi ai đó thay đổi, mọi người đều được cập nhật)
       const saveToCloud = async (newDataMap) => {
-         if (!user || !db) return;
+         if (!db) return;
          const { doc, setDoc } = window.FirebaseLib;
-         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-         const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'workspace', 'data');
+         const docRef = doc(db, 'aka_agency', 'team_workspace');
          
          const serialized = {};
          for (const key in newDataMap) {
@@ -281,6 +282,7 @@
          }
          
          try {
+            // Sử dụng merge: true để chỉ ghi đè những trường bị thay đổi, tránh mất dữ liệu khi nhiều người thao tác cùng lúc
             await setDoc(docRef, serialized, { merge: true });
          } catch (error) {
             console.error("Lỗi lưu dữ liệu:", error);
@@ -835,7 +837,7 @@
         triggerToast(`Đã xóa trường dữ liệu: "${label}"`);
       };
 
-      const toggleMemberSelection = (userId) => {
+      const toggleServiceSelection = (srvIdx) => {
         if (newProjectServices.includes(srvIdx)) {
           setNewProjectServices(newProjectServices.filter(idx => idx !== srvIdx));
         } else {
@@ -1304,7 +1306,12 @@
                           return (
                             <tr key={index} className="hover:bg-gray-50 transition-colors">
                               <td className="py-3 px-1 text-center"><span className="text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded w-full block truncate">{selectedProjObj ? selectedProjObj.bu : "-"}</span></td>
-                              <td className="py-3 px-1"><select value={row.projectId} onChange={(e) => { handleTrackerValueChange(index, 'projectId', e.target.value); handleTrackerValueChange(index, 'serviceName', ''); }} className="w-full text-xs px-2 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 cursor-pointer"><option value="">-- Chọn dự án --</option>{projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></td>
+                              <td className="py-3 px-1">
+                                <select value={row.projectId} onChange={(e) => { handleTrackerValueChange(index, 'projectId', e.target.value); handleTrackerValueChange(index, 'serviceName', ''); }} className="w-full text-xs px-2 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 cursor-pointer">
+                                  <option value="">-- Chọn dự án --</option>
+                                  {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                </select>
+                              </td>
                               <td className="py-3 px-1"><select value={row.serviceName} onChange={(e) => handleTrackerValueChange(index, 'serviceName', e.target.value)} className="w-full text-xs px-2 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 cursor-pointer"><option value="">-- Loại dịch vụ --</option>{projectServices.map((srv, idx) => <option key={idx} value={srv}>{srv}</option>)}</select></td>
                               <td className="py-3 px-1"><select value={row.desc} onChange={(e) => handleTrackerValueChange(index, 'desc', e.target.value)} className="w-full text-xs px-2 py-2 bg-white border border-gray-300 rounded-lg text-yellow-600 font-semibold focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 cursor-pointer"><option value="">-- Chọn loại --</option>{TASK_CATEGORIES.map(category => <option key={category} value={category}>{category}</option>)}</select></td>
                               {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(day => (
