@@ -12,10 +12,10 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   
-  <!-- FIX: Bổ sung thư viện react-is (Yêu cầu bắt buộc của Recharts/prop-types trong môi trường UMD) -->
+  <!-- Thư viện react-is (Yêu cầu bắt buộc của Recharts/prop-types trong môi trường UMD) -->
   <script crossorigin src="https://unpkg.com/react-is@18/umd/react-is.production.min.js"></script>
   
-  <!-- FIX 1: Ánh xạ React để lucide-react (bản UMD) có thể nhận diện đúng -->
+  <!-- Ánh xạ React để lucide-react (bản UMD) có thể nhận diện đúng -->
   <script>
     window.react = window.React;
   </script>
@@ -25,7 +25,6 @@
   
   <!-- Recharts Dependencies -->
   <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
-  <!-- FIX 3: Ghim phiên bản ổn định của Recharts -->
   <script src="https://unpkg.com/recharts@2.1.12/umd/Recharts.js"></script>
   
   <!-- Lucide Icons -->
@@ -49,7 +48,7 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
     
-    // FIX 2: Bắt chính xác biến toàn cục của LucideReact thông qua cơ chế Fallback an toàn
+    // Bắt chính xác biến toàn cục của LucideReact
     const LucideIcons = window.lucideReact || window.LucideReact || window.lucide || window.Lucide;
     
     // Khởi tạo các Icons
@@ -59,7 +58,7 @@
       Calendar, AlertCircle, Info, Users, Cpu, Filter, Sliders, FolderPlus 
     } = LucideIcons;
     
-    // FIX 4: Fallback an toàn cho đối tượng Recharts
+    // Fallback an toàn cho đối tượng Recharts
     const RechartsLib = window.Recharts || window.recharts || {};
 
     // Import Chart components từ Recharts
@@ -68,14 +67,13 @@
       ResponsiveContainer, Cell, Legend 
     } = RechartsLib;
 
-    // Bảng màu Chart được tuỳ chỉnh theo nhận diện thương hiệu aka (Vàng, Xám, Đen) mở rộng
+    // Bảng màu Chart được tuỳ chỉnh theo nhận diện thương hiệu aka
     const COLORS = [
       '#FACC15', '#1F2937', '#F59E0B', '#4B5563', 
       '#0F766E', '#D97706', '#334155', '#CA8A04', 
       '#0369A1', '#9CA3AF'
     ];
 
-    // Bảng màu chuyên biệt cho các Loại Công Việc
     const TASK_COLORS = [
       '#FACC15', '#334155', '#F59E0B', '#0F766E', 
       '#D97706', '#4B5563', '#0369A1', '#CA8A04', '#9CA3AF'
@@ -87,59 +85,14 @@
       "Monitor", "Report", "Training", "Operation", "Others"
     ];
 
-    // Danh sách các Business Unit (BU)
     const BUSINESS_UNITS = ["BU1", "BU2"];
-
-    // 1. Loại hình dịch vụ Martech
     const INITIAL_SERVICES = ["License", "Services"];
 
-    // 2. Danh sách nhân sự
-    const INITIAL_USERS = [
-      { id: "U01", name: "Thu Tran", role: "Project Manager", email: "thu.tran@martech.vn" },
-      { id: "U02", name: "Truc Nguyen", role: "Tech Lead", email: "truc.nguyen@martech.vn" },
-      { id: "U03", name: "Phuc Le", role: "Martech Engineer", email: "phuc.le@martech.vn" },
-      { id: "U04", name: "Anh Nguyen", role: "Data Analyst", email: "anh.nguyen@martech.vn" },
-      { id: "U05", name: "Khai Le", role: "Solution Architect", email: "khai.le@martech.vn" },
-      { id: "U06", name: "Tram Nguyen", role: "Content Specialist", email: "tram.nguyen@martech.vn" },
-      { id: "U07", name: "Lan Anh Nguyen", role: "Account Executive", email: "lananh.nguyen@martech.vn" },
-      { id: "U08", name: "Thai Nguyen", role: "Media Buyer", email: "thai.nguyen@martech.vn" },
-      { id: "U09", name: "Xuyen Dang", role: "SEO Specialist", email: "xuyen.dang@martech.vn" },
-      { id: "U10", name: "My Phan", role: "UI/UX Designer", email: "my.phan@martech.vn" },
-      { id: "U11", name: "Huong La", role: "CRM Consultant", email: "huong.la@martech.vn" },
-      { id: "U12", name: "Hoang Phuc Nguyen", role: "Automation Engineer", email: "hoangphuc.nguyen@martech.vn" },
-    ];
-
-    // Danh sách dự án mẫu ban đầu
-    const INITIAL_PROJECTS = [
-      { id: "P01", name: "HubSpot CRM License & Implementation", members: ["U01", "U03", "U11"], services: [0, 1], status: "Active", bu: "BU1", customData: {} },
-      { id: "P02", name: "CDP Segment Services & Customer Analytics", members: ["U02", "U04", "U12"], services: [1], status: "Active", bu: "BU2", customData: {} },
-      { id: "P03", name: "Salesforce Cloud Marketing License Integration", members: ["U05", "U07", "U10"], services: [0, 1], status: "Active", bu: "BU1", customData: {} },
-      { id: "P04", name: "Google Analytics 4 & BigQuery Pipeline setup", members: ["U03", "U04", "U12"], services: [1], status: "Active", bu: "BU2", customData: {} }
-    ];
-
-    // Danh sách trường dữ liệu dự án tùy chỉnh
-    const INITIAL_CUSTOM_FIELDS = [
-      { id: "F01", label: "Ngân Sách Dự Kiến (USD)", type: "number", required: false, placeholder: "Ví dụ: 5000" },
-      { id: "F02", label: "Ngày Kick-off", type: "date", required: false, placeholder: "" },
-      { id: "F03", label: "Ghi chú ưu tiên", type: "text", required: false, placeholder: "Ví dụ: Dự án trọng điểm quý 2" }
-    ];
-
-    // Dữ liệu log giờ mẫu
-    const INITIAL_TIME_LOGS = [
-      { id: "L01", userId: "U01", projectId: "P01", service: "Services", date: "2026-04-27", hours: 6, week: "2026-W18", month: "2026-04", quarter: "2026-Q2", description: "PM" },
-      { id: "L02", userId: "U03", projectId: "P01", service: "Services", date: "2026-04-27", hours: 8, week: "2026-W18", month: "2026-04", quarter: "2026-Q2", description: "Integration" },
-      { id: "L03", userId: "U11", projectId: "P01", service: "License", date: "2026-04-28", hours: 4, week: "2026-W18", month: "2026-04", quarter: "2026-Q2", description: "Technical Support" },
-      { id: "L04", userId: "U02", projectId: "P02", service: "Services", date: "2026-04-28", hours: 7, week: "2026-W18", month: "2026-04", quarter: "2026-Q2", description: "Integration" },
-      { id: "L05", userId: "U04", projectId: "P02", service: "Services", date: "2026-04-29", hours: 8, week: "2026-W18", month: "2026-04", quarter: "2026-Q2", description: "PM" },
-      { id: "L06", userId: "U03", projectId: "P01", service: "Services", date: "2026-05-04", hours: 8, week: "2026-W19", month: "2026-05", quarter: "2026-Q2", description: "Integration" },
-      { id: "L07", userId: "U11", projectId: "P01", service: "Services", date: "2026-05-05", hours: 6, week: "2026-W19", month: "2026-05", quarter: "2026-Q2", description: "Training" },
-      { id: "L08", userId: "U05", projectId: "P03", service: "License", date: "2026-05-05", hours: 8, week: "2026-W19", month: "2026-05", quarter: "2026-Q2", description: "Paperwork" },
-      { id: "L09", userId: "U07", projectId: "P03", service: "Services", date: "2026-05-06", hours: 5, week: "2026-W19", month: "2026-05", quarter: "2026-Q2", description: "PM" },
-      { id: "L10", userId: "U10", projectId: "P03", service: "Services", date: "2026-05-07", hours: 8, week: "2026-W19", month: "2026-05", quarter: "2026-Q2", description: "Operation" },
-      { id: "L11", userId: "U12", projectId: "P04", service: "Services", date: "2026-05-11", hours: 8, week: "2026-W20", month: "2026-05", quarter: "2026-Q2", description: "Integration" },
-      { id: "L12", userId: "U04", projectId: "P04", service: "Services", date: "2026-05-12", hours: 7, week: "2026-W20", month: "2026-05", quarter: "2026-Q2", description: "Report" },
-      { id: "L13", userId: "U03", projectId: "P04", service: "Services", date: "2026-05-13", hours: 6, week: "2026-W20", month: "2026-05", quarter: "2026-Q2", description: "Monitor" }
-    ];
+    // ĐÃ XÓA TOÀN BỘ DỮ LIỆU MẪU ĐỂ NHẬP TỪ ĐẦU
+    const INITIAL_USERS = [];
+    const INITIAL_PROJECTS = [];
+    const INITIAL_CUSTOM_FIELDS = [];
+    const INITIAL_TIME_LOGS = [];
 
     // Helpers tính toán lịch tuần
     const getWeekRange = (weekStr) => {
@@ -214,9 +167,8 @@
 
     const getCurrentWeekString = () => {
       const info = getDateInfo(new Date().toISOString().split('T')[0]);
-      return info ? info.week : "2026-W20";
+      return info ? info.week : "2026-W20"; // Giá trị fallback nếu lỗi
     };
-
 
     function App() {
       // App Navigation & Core States
@@ -225,10 +177,19 @@
       const [users, setUsers] = useState(INITIAL_USERS);
       const [services, setServices] = useState(INITIAL_SERVICES);
       const [timeLogs, setTimeLogs] = useState(INITIAL_TIME_LOGS);
-      
       const [customFields, setCustomFields] = useState(INITIAL_CUSTOM_FIELDS);
-      const [currentUser, setCurrentUser] = useState("U11");
+      
+      const [currentUser, setCurrentUser] = useState("");
       const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+
+      // Auto-select user đầu tiên nếu currentUser trống và users có dữ liệu
+      useEffect(() => {
+        if (users.length > 0 && (!currentUser || !users.find(u => u.id === currentUser))) {
+          setCurrentUser(users[0].id);
+        } else if (users.length === 0) {
+          setCurrentUser("");
+        }
+      }, [users, currentUser]);
 
       const triggerToast = (message, type = "success") => {
         setToast({ show: true, message, type });
@@ -247,7 +208,6 @@
       const [dashboardToDate, setDashboardToDate] = useState(""); 
       const [filterUser, setFilterUser] = useState("ALL");
 
-      // Áp dụng bộ lọc chính cho logs
       const filteredLogs = useMemo(() => {
         return timeLogs.filter(log => {
           const proj = projects.find(p => p.id === log.projectId);
@@ -259,12 +219,8 @@
           const matchUser = filterUser === "ALL" || log.userId === filterUser;
           
           let matchTime = true;
-          if (dashboardFromDate) {
-            matchTime = matchTime && log.date >= dashboardFromDate;
-          }
-          if (dashboardToDate) {
-            matchTime = matchTime && log.date <= dashboardToDate;
-          }
+          if (dashboardFromDate) matchTime = matchTime && log.date >= dashboardFromDate;
+          if (dashboardToDate) matchTime = matchTime && log.date <= dashboardToDate;
           
           return matchProject && matchBU && matchService && matchUser && matchTime;
         });
@@ -346,7 +302,7 @@
           .filter(item => item.hours > 0);
       }, [filteredLogs, projects]);
 
-      // Biểu đồ nhân sự theo loại công việc (Tách riêng cho BU1 và BU2)
+      // Biểu đồ nhân sự theo loại công việc
       const getChartDataForBU = (buName) => {
         const logsForBU = filteredLogs.filter(log => {
           const p = projects.find(proj => proj.id === log.projectId);
@@ -414,7 +370,6 @@
             projectServicePercentage
           };
         }).sort((a, b) => b.hours - a.hours);
-
       }, [filteredLogs, users, projects]);
 
       // Bảng Báo cáo công việc theo Dịch vụ
@@ -454,12 +409,8 @@
             servicePercentage
           };
         }).sort((a, b) => b.hours - a.hours);
-
       }, [filteredLogs, users, projects]);
 
-      /* -------------------------------------------------------------
-         BẢNG MA TRẬN CHÉO (CROSS-TAB MATRIX) CHO DỰ ÁN
-         ------------------------------------------------------------- */
       const crossProjectContribution = useMemo(() => {
         const matrix = [];
         users.forEach(user => {
@@ -493,6 +444,97 @@
         return { matrix, projectTotals };
       }, [filteredLogs, users, projects, filterUser]);
 
+      /* -------------------------------------------------------------
+         TAB BÁO CÁO CHI TIẾT & XUẤT EXCEL (TÁCH BIỆT BỘ LỌC THỜI GIAN)
+         ------------------------------------------------------------- */
+      const [reportFromDate, setReportFromDate] = useState(""); 
+      const [reportToDate, setReportToDate] = useState(""); 
+
+      const reportFilteredLogs = useMemo(() => {
+        return timeLogs.filter(log => {
+          const proj = projects.find(p => p.id === log.projectId);
+          const logBU = proj ? proj.bu : "N/A";
+
+          // Giữ nguyên các bộ lọc Context (Dự án, BU, Dịch vụ, Nhân sự) của Dashboard
+          const matchProject = filterProject === "ALL" || log.projectId === filterProject;
+          const matchBU = filterBU === "ALL" || logBU === filterBU;
+          const matchService = filterService === "ALL" || log.service === filterService;
+          const matchUser = filterUser === "ALL" || log.userId === filterUser;
+          
+          // Nhưng áp dụng mốc thời gian riêng cho tab Report
+          let matchTime = true;
+          if (reportFromDate) matchTime = matchTime && log.date >= reportFromDate;
+          if (reportToDate) matchTime = matchTime && log.date <= reportToDate;
+          
+          return matchProject && matchBU && matchService && matchUser && matchTime;
+        });
+      }, [timeLogs, filterProject, filterBU, filterService, reportFromDate, reportToDate, filterUser, projects]);
+
+      const reportTotalHoursFiltered = useMemo(() => {
+        return reportFilteredLogs.reduce((sum, log) => sum + log.hours, 0);
+      }, [reportFilteredLogs]);
+
+      const handleDeleteLog = (logId) => {
+        setTimeLogs(prev => prev.filter(log => log.id !== logId));
+        triggerToast("Đã xóa dòng nhật ký thành công!", "success");
+      };
+
+      const exportToExcel = () => {
+        if (typeof window.XLSX === 'undefined') {
+          triggerToast("Đang tải thư viện xuất file, vui lòng thử lại sau 1 giây!", "warning");
+          return;
+        }
+
+        try {
+          const XLSX = window.XLSX;
+          
+          const logsData = reportFilteredLogs.map((log, index) => {
+            const userObj = users.find(u => u.id === log.userId);
+            const projObj = projects.find(p => p.id === log.projectId);
+            return {
+              "STT": index + 1,
+              "Ngày Thực Hiện": log.date,
+              "Nhân Sự": userObj ? userObj.name : "N/A",
+              "BU": projObj ? projObj.bu : "N/A",
+              "Dự Án": projObj ? projObj.name : "N/A",
+              "Dịch Vụ Martech": log.service,
+              "Loại Công Việc": log.description,
+              "Số Giờ": log.hours,
+              "Tuần": log.week,
+              "Tháng": log.month,
+              "Quý": log.quarter
+            };
+          });
+
+          // Tái cấu trúc summary cho Sheet 1 & 2 dựa trên reportFilteredLogs
+          const projMap = {};
+          reportFilteredLogs.forEach(log => {
+             projMap[log.projectId] = (projMap[log.projectId] || 0) + log.hours;
+          });
+          const summaryData = Object.keys(projMap).map((id, index) => {
+            const proj = projects.find(p => p.id === id);
+            return {
+              "STT": index + 1,
+              "Mã Dự Án": id,
+              "Tên Dự Án": proj ? proj.name : "N/A",
+              "Business Unit (BU)": proj ? proj.bu : "N/A",
+              "Tổng Số Giờ Hoạt Động": projMap[id],
+              "Tỷ Lệ Đóng Góp (%)": reportTotalHoursFiltered > 0 ? ((projMap[id] / reportTotalHoursFiltered) * 100).toFixed(2) : 0
+            };
+          });
+
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryData), "Tổng Quan Dự Án");
+          XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(logsData), "Nhật Ký Chi Tiết");
+
+          const fileName = `Bao_Cao_Chi_Tiet_Martech_${Date.now().toString().slice(-4)}.xlsx`;
+          XLSX.writeFile(wb, fileName);
+          triggerToast("Xuất báo cáo Excel thành công!", "success");
+        } catch (error) {
+          console.error("Lỗi xuất file:", error);
+          triggerToast("Lỗi trong quá trình tạo file Excel!", "error");
+        }
+      };
 
       /* -------------------------------------------------------------
          TAB 2: NHẬP GIỜ LÀM VIỆC HÀNG TUẦN (BATCH INPUT & SUBMIT)
@@ -532,6 +574,11 @@
       const handleSubmitTimeLogs = (e) => {
         e.preventDefault();
         
+        if (!currentUser) {
+          triggerToast("Vui lòng khởi tạo và chọn nhân sự trước khi chấm công!", "error"); 
+          return; 
+        }
+
         let hasValidData = false;
         const newLogsToAppend = [];
         const fieldsMap = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
@@ -565,7 +612,7 @@
                 week: trackerWeek,
                 month: dateInfoObj.month,
                 quarter: dateInfoObj.quarter,
-                description: row.desc // Nhóm Công Việc (Task Category)
+                description: row.desc
               });
             }
           });
@@ -583,77 +630,6 @@
             { projectId: "", serviceName: "", mon: "", tue: "", wed: "", thu: "", fri: "", sat: "", sun: "", desc: "" }
           ]);
           triggerToast(`Đã lưu thành công ${newLogsToAppend.length} lượt log giờ của tuần ${trackerWeek}!`, "success");
-        }
-      };
-
-      /* -------------------------------------------------------------
-         TAB 3: EXPORT DỮ LIỆU EXCEL
-         ------------------------------------------------------------- */
-      const exportToExcel = () => {
-        if (typeof window.XLSX === 'undefined') {
-          triggerToast("Đang tải thư viện xuất file, vui lòng thử lại sau 1 giây!", "warning");
-          return;
-        }
-
-        try {
-          const XLSX = window.XLSX;
-          
-          const summaryData = hoursByProjectData.map((item, index) => {
-            const proj = projects.find(p => p.id === item.id);
-            return {
-              "STT": index + 1,
-              "Mã Dự Án": item.id,
-              "Tên Dự Án": item.fullName,
-              "Business Unit (BU)": proj ? proj.bu : "N/A",
-              "Tổng Số Giờ Hoạt Động": item.hours,
-              "Tỷ Lệ Đóng Góp (%)": totalHoursFiltered > 0 ? ((item.hours / totalHoursFiltered) * 105).toFixed(2) : 0
-            };
-          });
-
-          const serviceSheetData = servicePersonnelContributionData.map((item, index) => {
-            const proj = projects.find(p => p.id === item.projectId);
-            return {
-              "STT": index + 1,
-              "Nhân Sự": item.userName,
-              "Vai Trò": item.userRole,
-              "Dự Án": item.projectName,
-              "BU": proj ? proj.bu : "N/A",
-              "Dịch Vụ Martech": item.serviceName,
-              "Thời Gian Thực Hiện (h)": item.hours,
-              "Tổng Giờ Hạng Mục (Dự Án + DV)": item.projectServiceTotalHours,
-              "Tỷ Lệ % Đóng Góp": item.projectServicePercentage
-            };
-          });
-
-          const logsData = filteredLogs.map((log, index) => {
-            const userObj = users.find(u => u.id === log.userId);
-            const projObj = projects.find(p => p.id === log.projectId);
-            return {
-              "STT": index + 1,
-              "Ngày Thực Hiện": log.date,
-              "Nhân Sự": userObj ? userObj.name : "N/A",
-              "BU": projObj ? projObj.bu : "N/A",
-              "Dự Án": projObj ? projObj.name : "N/A",
-              "Dịch Vụ Martech": log.service,
-              "Loại Công Việc": log.description,
-              "Số Giờ": log.hours,
-              "Tuần": log.week,
-              "Tháng": log.month,
-              "Quý": log.quarter
-            };
-          });
-
-          const wb = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryData), "Tổng Quan Dự Án");
-          XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(serviceSheetData), "Báo Cáo Đóng Góp Dịch Vụ");
-          XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(logsData), "Nhật Ký Chi Tiết");
-
-          const fileName = `Bao_Cao_Nhan_Su_Dich_Vu_Martech_${Date.now().toString().slice(-4)}.xlsx`;
-          XLSX.writeFile(wb, fileName);
-          triggerToast("Xuất báo cáo Excel thành công!", "success");
-        } catch (error) {
-          console.error("Lỗi xuất file:", error);
-          triggerToast("Lỗi trong quá trình tạo file Excel!", "error");
         }
       };
 
@@ -747,7 +723,7 @@
       return (
         <div className="min-h-screen bg-gray-50 text-gray-900 font-sans flex flex-col relative pb-10 selection:bg-yellow-200">
           
-          {/* Toast Notification Container */}
+          {/* Toast Notification */}
           {toast.show && (
             <div className={`fixed bottom-6 right-6 z-50 px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 text-sm font-bold transition-all transform animate-in slide-in-from-bottom-5 ${
               toast.type === 'error' ? 'bg-rose-600 text-white shadow-rose-600/20' :
@@ -771,7 +747,7 @@
                 </div>
                 <div>
                   <h1 className="text-xl font-bold tracking-tight text-gray-900 flex items-center gap-2">
-                    <span className="text-yellow-500 italic font-serif text-2xl pr-0.5">aka</span>
+                    <span className="text-yellow-500 italic font-serif text-2xl pr-0.5">AKA</span>
                     MARTECH AGENCY 
                     <span className="text-[10px] bg-gray-100 text-yellow-600 font-bold px-2 py-0.5 rounded border border-gray-200 uppercase tracking-wider ml-1 mt-0.5">Workspace</span>
                   </h1>
@@ -781,7 +757,7 @@
 
               <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 gap-2 self-start md:self-auto">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                  <span className={`w-2.5 h-2.5 rounded-full animate-pulse ${users.length > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
                   <span className="text-xs text-gray-500 font-medium">Đang thao tác:</span>
                 </div>
                 <select 
@@ -790,8 +766,10 @@
                     setCurrentUser(e.target.value);
                     triggerToast(`Đã chuyển sang tài khoản: ${users.find(u => u.id === e.target.value)?.name}`);
                   }}
-                  className="bg-transparent border-none text-sm text-yellow-600 font-bold focus:ring-0 cursor-pointer p-0 pr-6"
+                  disabled={users.length === 0}
+                  className="bg-transparent border-none text-sm text-yellow-600 font-bold focus:ring-0 cursor-pointer p-0 pr-6 disabled:opacity-50"
                 >
+                  {users.length === 0 && <option value="">Chưa có nhân sự</option>}
                   {users.map(u => (
                     <option key={u.id} value={u.id} className="text-gray-900">
                       {u.name} ({u.role})
@@ -806,51 +784,18 @@
           {/* Tab Navigation Menu */}
           <div className="bg-white border-b border-gray-200 px-6 shadow-sm z-30">
             <div className="max-w-7xl mx-auto flex overflow-x-auto scrollbar-none gap-2 py-2">
-              
-              <button 
-                onClick={() => setActiveTab('logtime')}
-                className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                  activeTab === 'logtime' 
-                    ? 'bg-yellow-400 text-gray-900 shadow-md shadow-yellow-400/20' 
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-              >
+              <button onClick={() => setActiveTab('logtime')} className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${activeTab === 'logtime' ? 'bg-yellow-400 text-gray-900 shadow-md shadow-yellow-400/20' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
                 <Clock className="w-4 h-4" /> Nhập Giờ Làm Việc (Hàng Tuần)
               </button>
-
-              <button 
-                onClick={() => setActiveTab('dashboard')}
-                className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                  activeTab === 'dashboard' 
-                    ? 'bg-yellow-400 text-gray-900 shadow-md shadow-yellow-400/20' 
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-              >
+              <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${activeTab === 'dashboard' ? 'bg-yellow-400 text-gray-900 shadow-md shadow-yellow-400/20' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
                 <LayoutDashboard className="w-4 h-4" /> Báo Cáo Tổng Hợp
               </button>
-
-              <button 
-                onClick={() => setActiveTab('report')}
-                className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                  activeTab === 'report' 
-                    ? 'bg-yellow-400 text-gray-900 shadow-md shadow-yellow-400/20' 
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-              >
+              <button onClick={() => setActiveTab('report')} className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${activeTab === 'report' ? 'bg-yellow-400 text-gray-900 shadow-md shadow-yellow-400/20' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
                 <FileSpreadsheet className="w-4 h-4" /> Bảng Tính Chi Tiết & Xuất Excel
               </button>
-
-              <button 
-                onClick={() => setActiveTab('settings')}
-                className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                  activeTab === 'settings' 
-                    ? 'bg-yellow-400 text-gray-900 shadow-md shadow-yellow-400/20' 
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-              >
+              <button onClick={() => setActiveTab('settings')} className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${activeTab === 'settings' ? 'bg-yellow-400 text-gray-900 shadow-md shadow-yellow-400/20' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
                 <Settings className="w-4 h-4" /> Cấu Hình Dự Án & Thành Viên
               </button>
-
             </div>
           </div>
 
@@ -878,11 +823,7 @@
 
                   <div className="w-[120px]">
                     <label className="block text-xs text-gray-500 mb-1.5 font-medium uppercase tracking-wider">Lọc BU</label>
-                    <select 
-                      value={filterBU}
-                      onChange={(e) => setFilterBU(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900 font-medium cursor-pointer"
-                    >
+                    <select value={filterBU} onChange={(e) => setFilterBU(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900 font-medium cursor-pointer">
                       <option value="ALL">Tất cả BU</option>
                       {BUSINESS_UNITS.map(bu => <option key={bu} value={bu}>{bu}</option>)}
                     </select>
@@ -890,11 +831,7 @@
 
                   <div className="w-[150px]">
                     <label className="block text-xs text-gray-500 mb-1.5 font-medium uppercase tracking-wider">Lọc Dịch vụ</label>
-                    <select 
-                      value={filterService}
-                      onChange={(e) => setFilterService(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900 font-medium cursor-pointer"
-                    >
+                    <select value={filterService} onChange={(e) => setFilterService(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900 font-medium cursor-pointer">
                       <option value="ALL">Tất cả dịch vụ</option>
                       {services.map(srv => <option key={srv} value={srv}>{srv}</option>)}
                     </select>
@@ -905,22 +842,12 @@
                       <label className="block text-xs text-gray-500 mb-1.5 font-medium uppercase tracking-wider">Từ ngày</label>
                       <div className="relative">
                         <Calendar className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                        <input 
-                          type="date"
-                          value={dashboardFromDate}
-                          onChange={(e) => setDashboardFromDate(e.target.value)}
-                          className="w-full pl-9 pr-2 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900 font-medium cursor-pointer"
-                        />
+                        <input type="date" value={dashboardFromDate} onChange={(e) => setDashboardFromDate(e.target.value)} className="w-full pl-9 pr-2 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900 font-medium cursor-pointer" />
                       </div>
                     </div>
                     <div className="w-[140px]">
                       <label className="block text-xs text-gray-500 mb-1.5 font-medium uppercase tracking-wider">Đến ngày</label>
-                      <input 
-                        type="date"
-                        value={dashboardToDate}
-                        onChange={(e) => setDashboardToDate(e.target.value)}
-                        className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900 font-medium cursor-pointer"
-                      />
+                      <input type="date" value={dashboardToDate} onChange={(e) => setDashboardToDate(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900 font-medium cursor-pointer" />
                     </div>
                   </div>
 
@@ -928,11 +855,7 @@
                     <label className="block text-xs text-gray-500 mb-1.5 font-medium uppercase tracking-wider">Nhân sự chính</label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                      <select 
-                        value={filterUser}
-                        onChange={(e) => setFilterUser(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900 font-medium cursor-pointer"
-                      >
+                      <select value={filterUser} onChange={(e) => setFilterUser(e.target.value)} className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-gray-900 font-medium cursor-pointer">
                         <option value="ALL">Tất cả nhân viên</option>
                         {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
                       </select>
@@ -942,44 +865,24 @@
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div className="bg-white p-5 rounded-2xl border border-gray-200 flex items-center gap-4 shadow-sm hover:border-yellow-400 transition-colors">
-                    <div className="p-3 bg-yellow-100 rounded-xl text-yellow-600">
-                      <Briefcase className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <span className="block text-xs text-gray-500 font-medium">Số Dự Án BU1 Đang Hoạt Động</span>
-                      <span className="text-2xl font-bold text-gray-900">{bu1ProjectCount} <span className="text-xs text-gray-400 font-normal">Dự án</span></span>
-                    </div>
+                    <div className="p-3 bg-yellow-100 rounded-xl text-yellow-600"><Briefcase className="w-6 h-6" /></div>
+                    <div><span className="block text-xs text-gray-500 font-medium">Số Dự Án BU1 Đang Hoạt Động</span><span className="text-2xl font-bold text-gray-900">{bu1ProjectCount} <span className="text-xs text-gray-400 font-normal">Dự án</span></span></div>
                   </div>
                   <div className="bg-white p-5 rounded-2xl border border-gray-200 flex items-center gap-4 shadow-sm hover:border-gray-400 transition-colors">
-                    <div className="p-3 bg-gray-100 rounded-xl text-gray-600">
-                      <Briefcase className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <span className="block text-xs text-gray-500 font-medium">Số Dự Án BU2 Đang Hoạt Động</span>
-                      <span className="text-2xl font-bold text-gray-900">{bu2ProjectCount} <span className="text-xs text-gray-400 font-normal">Dự án</span></span>
-                    </div>
+                    <div className="p-3 bg-gray-100 rounded-xl text-gray-600"><Briefcase className="w-6 h-6" /></div>
+                    <div><span className="block text-xs text-gray-500 font-medium">Số Dự Án BU2 Đang Hoạt Động</span><span className="text-2xl font-bold text-gray-900">{bu2ProjectCount} <span className="text-xs text-gray-400 font-normal">Dự án</span></span></div>
                   </div>
                   <div className="bg-white p-5 rounded-2xl border border-gray-200 flex items-center gap-4 shadow-sm hover:border-yellow-400 transition-colors">
-                    <div className="p-3 bg-yellow-100 rounded-xl text-yellow-600">
-                      <Users className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <span className="block text-xs text-gray-500 font-medium">Nhân Sự Phát Sinh Giờ</span>
-                      <span className="text-2xl font-bold text-gray-900">{uniquePersonnelCount} / {users.length} <span className="text-xs text-gray-400 font-normal">Cá nhân</span></span>
-                    </div>
+                    <div className="p-3 bg-yellow-100 rounded-xl text-yellow-600"><Users className="w-6 h-6" /></div>
+                    <div><span className="block text-xs text-gray-500 font-medium">Nhân Sự Phát Sinh Giờ</span><span className="text-2xl font-bold text-gray-900">{uniquePersonnelCount} / {users.length} <span className="text-xs text-gray-400 font-normal">Cá nhân</span></span></div>
                   </div>
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl border border-gray-200 flex flex-col shadow-sm">
                   <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 border-b border-gray-100 pb-4 mb-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="p-2 bg-yellow-50 rounded-xl text-yellow-600 border border-yellow-100">
-                        <Users className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900">Bảng Tổng Số Lượng Nhân Sự Theo Dự Án</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">Thống kê số lượng nhân sự tham gia vào từng dự án / dịch vụ</p>
-                      </div>
+                      <div className="p-2 bg-yellow-50 rounded-xl text-yellow-600 border border-yellow-100"><Users className="w-5 h-5" /></div>
+                      <div><h3 className="text-sm font-bold uppercase tracking-wider text-gray-900">Bảng Tổng Số Lượng Nhân Sự Theo Dự Án</h3><p className="text-xs text-gray-500 mt-0.5">Thống kê số lượng nhân sự tham gia vào từng dự án / dịch vụ</p></div>
                     </div>
                   </div>
                   {projectPersonnelCountData.length > 0 ? (
@@ -987,50 +890,31 @@
                       <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>
                           <tr className="border-b border-gray-200 text-gray-500 text-xs font-semibold uppercase bg-gray-50">
-                            <th className="py-3 px-4 w-[15%] text-center rounded-tl-lg">BU</th>
-                            <th className="py-3 px-4 w-[40%]">Dự Án</th>
-                            <th className="py-3 px-4 w-[25%]">Loại Dịch Vụ</th>
-                            <th className="py-3 px-4 w-[20%] text-center rounded-tr-lg">Số Lượng Nhân Sự</th>
+                            <th className="py-3 px-4 w-[15%] text-center rounded-tl-lg">BU</th><th className="py-3 px-4 w-[40%]">Dự Án</th><th className="py-3 px-4 w-[25%]">Loại Dịch Vụ</th><th className="py-3 px-4 w-[20%] text-center rounded-tr-lg">Số Lượng Nhân Sự</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 text-xs">
                           {projectPersonnelCountData.map((item, index) => (
                             <tr key={index} className="hover:bg-gray-50 transition-colors">
-                              <td className="py-3.5 px-4 text-center">
-                                <span className="text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded">{item.bu}</span>
-                              </td>
+                              <td className="py-3.5 px-4 text-center"><span className="text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded">{item.bu}</span></td>
                               <td className="py-3.5 px-4 text-gray-800 font-bold">{item.projectName}</td>
-                              <td className="py-3.5 px-4">
-                                <span className={`px-2.5 py-1 rounded-lg border text-xs font-semibold whitespace-nowrap ${item.service === "License" ? "bg-gray-100 text-gray-700 border-gray-200" : "bg-yellow-50 text-yellow-700 border-yellow-200"}`}>{item.service}</span>
-                              </td>
-                              <td className="py-3.5 px-4 text-center">
-                                <div className="bg-white px-3 py-1.5 rounded-lg border border-gray-200 inline-block text-gray-900 shadow-sm font-extrabold text-sm">
-                                  {item.personnelCount} <span className="text-[10px] text-gray-500 font-normal">người</span>
-                                </div>
-                              </td>
+                              <td className="py-3.5 px-4"><span className={`px-2.5 py-1 rounded-lg border text-xs font-semibold whitespace-nowrap ${item.service === "License" ? "bg-gray-100 text-gray-700 border-gray-200" : "bg-yellow-50 text-yellow-700 border-yellow-200"}`}>{item.service}</span></td>
+                              <td className="py-3.5 px-4 text-center"><div className="bg-white px-3 py-1.5 rounded-lg border border-gray-200 inline-block text-gray-900 shadow-sm font-extrabold text-sm">{item.personnelCount} <span className="text-[10px] text-gray-500 font-normal">người</span></div></td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
                   ) : (
-                    <div className="py-12 text-center text-gray-400 flex flex-col items-center justify-center gap-2">
-                      <Users className="w-10 h-10 opacity-30 text-gray-300" />
-                      <p className="text-sm font-semibold text-gray-500">Không tìm thấy dữ liệu.</p>
-                    </div>
+                    <div className="py-12 text-center text-gray-400 flex flex-col items-center justify-center gap-2"><Users className="w-10 h-10 opacity-30 text-gray-300" /><p className="text-sm font-semibold text-gray-500">Chưa có dữ liệu.</p></div>
                   )}
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl border border-gray-200 flex flex-col shadow-sm">
                   <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 border-b border-gray-100 pb-4 mb-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="p-2 bg-yellow-50 rounded-xl text-yellow-600 border border-yellow-100">
-                        <Cpu className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900">Bảng Báo Cáo Công Việc Theo Dự Án</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">Thống kê chi tiết dựa theo bộ lọc tổng ở trên</p>
-                      </div>
+                      <div className="p-2 bg-yellow-50 rounded-xl text-yellow-600 border border-yellow-100"><Cpu className="w-5 h-5" /></div>
+                      <div><h3 className="text-sm font-bold uppercase tracking-wider text-gray-900">Bảng Báo Cáo Công Việc Theo Dự Án</h3><p className="text-xs text-gray-500 mt-0.5">Thống kê chi tiết dựa theo bộ lọc tổng ở trên</p></div>
                     </div>
                   </div>
                   {servicePersonnelContributionData.length > 0 ? (
@@ -1038,11 +922,7 @@
                       <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>
                           <tr className="border-b border-gray-200 text-gray-500 text-xs font-semibold uppercase bg-gray-50">
-                            <th className="py-3 px-4 w-[22%] rounded-tl-lg">Nhân Sự Thực Hiện</th>
-                            <th className="py-3 px-4 w-[8%] text-center">BU</th>
-                            <th className="py-3 px-4 w-[25%]">Dự Án Đang Tham Gia</th>
-                            <th className="py-3 px-4 w-[15%]">Loại Dịch Vụ</th>
-                            <th className="py-3 px-4 text-right w-[30%] rounded-tr-lg">Số Giờ Đóng Góp (Tỷ lệ)</th>
+                            <th className="py-3 px-4 w-[22%] rounded-tl-lg">Nhân Sự Thực Hiện</th><th className="py-3 px-4 w-[8%] text-center">BU</th><th className="py-3 px-4 w-[25%]">Dự Án Đang Tham Gia</th><th className="py-3 px-4 w-[15%]">Loại Dịch Vụ</th><th className="py-3 px-4 text-right w-[30%] rounded-tr-lg">Số Giờ Đóng Góp (Tỷ lệ)</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 text-xs">
@@ -1051,19 +931,12 @@
                               <td className="py-3.5 px-4">
                                 <div className="flex items-center gap-2.5">
                                   <div className="w-8 h-8 rounded-full bg-yellow-100 border border-yellow-200 flex items-center justify-center text-yellow-600 font-bold shrink-0">{item.userName.charAt(0)}</div>
-                                  <div className="truncate">
-                                    <div className="font-semibold text-gray-900 text-sm">{item.userName}</div>
-                                    <div className="text-[10px] text-gray-500">{item.userRole}</div>
-                                  </div>
+                                  <div className="truncate"><div className="font-semibold text-gray-900 text-sm">{item.userName}</div><div className="text-[10px] text-gray-500">{item.userRole}</div></div>
                                 </div>
                               </td>
-                              <td className="py-3.5 px-4 text-center">
-                                <span className="text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded">{item.bu}</span>
-                              </td>
+                              <td className="py-3.5 px-4 text-center"><span className="text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded">{item.bu}</span></td>
                               <td className="py-3.5 px-4 text-gray-800 font-medium">{item.projectName}</td>
-                              <td className="py-3.5 px-4">
-                                <span className={`px-2.5 py-1 rounded-lg border text-xs font-semibold whitespace-nowrap ${item.serviceName === "License" ? "bg-gray-100 text-gray-700 border-gray-200" : "bg-yellow-50 text-yellow-700 border-yellow-200"}`}>{item.serviceName}</span>
-                              </td>
+                              <td className="py-3.5 px-4"><span className={`px-2.5 py-1 rounded-lg border text-xs font-semibold whitespace-nowrap ${item.serviceName === "License" ? "bg-gray-100 text-gray-700 border-gray-200" : "bg-yellow-50 text-yellow-700 border-yellow-200"}`}>{item.serviceName}</span></td>
                               <td className="py-3.5 px-4 text-right">
                                 <div className="flex flex-col items-end">
                                   <div className="bg-white px-3 py-1.5 rounded-lg border border-gray-200 inline-block text-gray-900 shadow-sm font-extrabold text-sm mb-1">{item.hours} <span className="text-[10px] text-gray-500 font-normal">giờ</span></div>
@@ -1076,23 +949,15 @@
                       </table>
                     </div>
                   ) : (
-                    <div className="py-12 text-center text-gray-400 flex flex-col items-center justify-center gap-2">
-                      <Cpu className="w-10 h-10 opacity-30 animate-pulse text-gray-300" />
-                      <p className="text-sm font-semibold text-gray-500">Không tìm thấy dữ liệu.</p>
-                    </div>
+                    <div className="py-12 text-center text-gray-400 flex flex-col items-center justify-center gap-2"><Cpu className="w-10 h-10 opacity-30 animate-pulse text-gray-300" /><p className="text-sm font-semibold text-gray-500">Chưa có dữ liệu.</p></div>
                   )}
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl border border-gray-200 flex flex-col shadow-sm">
                   <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 border-b border-gray-100 pb-4 mb-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="p-2 bg-yellow-50 rounded-xl text-yellow-600 border border-yellow-100">
-                        <Layers className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900">Bảng Báo Cáo Công Việc Theo Dịch Vụ</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">Thống kê phân bổ nỗ lực của nhân sự theo từng loại dịch vụ</p>
-                      </div>
+                      <div className="p-2 bg-yellow-50 rounded-xl text-yellow-600 border border-yellow-100"><Layers className="w-5 h-5" /></div>
+                      <div><h3 className="text-sm font-bold uppercase tracking-wider text-gray-900">Bảng Báo Cáo Công Việc Theo Dịch Vụ</h3><p className="text-xs text-gray-500 mt-0.5">Thống kê phân bổ nỗ lực của nhân sự theo từng loại dịch vụ</p></div>
                     </div>
                   </div>
                   {serviceOnlyContributionData.length > 0 ? (
@@ -1100,10 +965,7 @@
                       <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>
                           <tr className="border-b border-gray-200 text-gray-500 text-xs font-semibold uppercase bg-gray-50">
-                            <th className="py-3 px-4 w-[30%] rounded-tl-lg">Nhân Sự Thực Hiện</th>
-                            <th className="py-3 px-4 w-[15%] text-center">BU</th>
-                            <th className="py-3 px-4 w-[25%]">Loại Dịch Vụ</th>
-                            <th className="py-3 px-4 w-[30%] text-right rounded-tr-lg">Số Giờ Đóng Góp (Tỷ lệ)</th>
+                            <th className="py-3 px-4 w-[30%] rounded-tl-lg">Nhân Sự Thực Hiện</th><th className="py-3 px-4 w-[15%] text-center">BU</th><th className="py-3 px-4 w-[25%]">Loại Dịch Vụ</th><th className="py-3 px-4 w-[30%] text-right rounded-tr-lg">Số Giờ Đóng Góp (Tỷ lệ)</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 text-xs">
@@ -1112,18 +974,11 @@
                               <td className="py-3.5 px-4">
                                 <div className="flex items-center gap-2.5">
                                   <div className="w-8 h-8 rounded-full bg-yellow-100 border border-yellow-200 flex items-center justify-center text-yellow-600 font-bold shrink-0">{item.userName.charAt(0)}</div>
-                                  <div className="truncate">
-                                    <div className="font-semibold text-gray-900 text-sm">{item.userName}</div>
-                                    <div className="text-[10px] text-gray-500">{item.userRole}</div>
-                                  </div>
+                                  <div className="truncate"><div className="font-semibold text-gray-900 text-sm">{item.userName}</div><div className="text-[10px] text-gray-500">{item.userRole}</div></div>
                                 </div>
                               </td>
-                              <td className="py-3.5 px-4 text-center">
-                                <span className="text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded">{item.bu}</span>
-                              </td>
-                              <td className="py-3.5 px-4">
-                                <span className={`px-2.5 py-1 rounded-lg border text-xs font-semibold whitespace-nowrap ${item.serviceName === "License" ? "bg-gray-100 text-gray-700 border-gray-200" : "bg-yellow-50 text-yellow-700 border-yellow-200"}`}>{item.serviceName}</span>
-                              </td>
+                              <td className="py-3.5 px-4 text-center"><span className="text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded">{item.bu}</span></td>
+                              <td className="py-3.5 px-4"><span className={`px-2.5 py-1 rounded-lg border text-xs font-semibold whitespace-nowrap ${item.serviceName === "License" ? "bg-gray-100 text-gray-700 border-gray-200" : "bg-yellow-50 text-yellow-700 border-yellow-200"}`}>{item.serviceName}</span></td>
                               <td className="py-3.5 px-4 text-right">
                                 <div className="flex flex-col items-end">
                                   <div className="bg-white px-3 py-1.5 rounded-lg border border-gray-200 inline-block text-gray-900 shadow-sm font-extrabold text-sm mb-1">{item.hours} <span className="text-[10px] text-gray-500 font-normal">giờ</span></div>
@@ -1136,22 +991,16 @@
                       </table>
                     </div>
                   ) : (
-                    <div className="py-12 text-center text-gray-400 flex flex-col items-center justify-center gap-2">
-                      <Cpu className="w-10 h-10 opacity-30 animate-pulse text-gray-300" />
-                      <p className="text-sm font-semibold text-gray-500">Không tìm thấy dữ liệu.</p>
-                    </div>
+                    <div className="py-12 text-center text-gray-400 flex flex-col items-center justify-center gap-2"><Cpu className="w-10 h-10 opacity-30 animate-pulse text-gray-300" /><p className="text-sm font-semibold text-gray-500">Chưa có dữ liệu.</p></div>
                   )}
                 </div>
 
                 <div className="bg-white p-5 rounded-2xl border border-gray-200 flex flex-col shadow-sm overflow-hidden">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 flex items-center gap-2">
-                      <Layers className="w-4.5 h-4.5 text-yellow-500" /> Bảng ma trận chéo phân bổ đóng góp nhân sự vào các dự án
-                    </h3>
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                      <Info className="w-3.5 h-3.5" /> <span>Số giờ & tỉ lệ (%) đóng góp trong từng dự án</span>
-                    </div>
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 flex items-center gap-2"><Layers className="w-4.5 h-4.5 text-yellow-500" /> Bảng ma trận chéo phân bổ đóng góp nhân sự vào các dự án</h3>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-400"><Info className="w-3.5 h-3.5" /> <span>Số giờ & tỉ lệ (%) đóng góp trong từng dự án</span></div>
                   </div>
+                  {projects.length > 0 ? (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[700px]">
                       <thead>
@@ -1179,10 +1028,7 @@
                               return (
                                 <td key={proj.id} className="py-3 px-3 text-center">
                                   {hours > 0 ? (
-                                    <div>
-                                      <div className="font-bold text-gray-900">{hours}h</div>
-                                      <div className="text-[10px] text-yellow-600 font-medium">{percentage}%</div>
-                                    </div>
+                                    <div><div className="font-bold text-gray-900">{hours}h</div><div className="text-[10px] text-yellow-600 font-medium">{percentage}%</div></div>
                                   ) : (<span className="text-gray-300">-</span>)}
                                 </td>
                               );
@@ -1193,13 +1039,14 @@
                       </tbody>
                     </table>
                   </div>
+                  ) : (
+                    <div className="text-center py-6 text-xs text-gray-400 italic">Vui lòng tạo dự án để xem ma trận chéo.</div>
+                  )}
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl border border-gray-200 flex flex-col shadow-sm">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 flex items-center gap-2">
-                      <Briefcase className="w-4.5 h-4.5 text-yellow-500" /> Biểu đồ Tổng Lượng Giờ Tích Lũy Theo Dự Án
-                    </h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 flex items-center gap-2"><Briefcase className="w-4.5 h-4.5 text-yellow-500" /> Biểu đồ Tổng Lượng Giờ Tích Lũy Theo Dự Án</h3>
                     <span className="text-xs text-gray-400">Đơn vị: Giờ</span>
                   </div>
                   <div className="h-[300px] w-full mt-2">
@@ -1209,22 +1056,14 @@
                           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                           <XAxis dataKey="name" stroke="#6b7280" fontSize={11} tickLine={false} />
                           <YAxis stroke="#6b7280" fontSize={11} tickLine={false} />
-                          <Tooltip 
-                            contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb', borderRadius: '8px', color: '#111827', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                            formatter={(value, name, props) => [`${value} giờ`, props.payload.fullName]}
-                          />
+                          <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb', borderRadius: '8px', color: '#111827', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} formatter={(value, name, props) => [`${value} giờ`, props.payload.fullName]} />
                           <Bar dataKey="hours" fill="#facc15" radius={[4, 4, 0, 0]}>
-                            {hoursByProjectData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
+                            {hoursByProjectData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                           </Bar>
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2">
-                        <Briefcase className="w-8 h-8 opacity-30" />
-                        <p className="text-sm">Không có dữ liệu log giờ phát sinh</p>
-                      </div>
+                      <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2"><Briefcase className="w-8 h-8 opacity-30" /><p className="text-sm">Chưa có dữ liệu biểu đồ.</p></div>
                     )}
                   </div>
                 </div>
@@ -1232,9 +1071,7 @@
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-white p-6 rounded-2xl border border-gray-200 flex flex-col shadow-sm">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 flex items-center gap-2">
-                        <TrendingUp className="w-4.5 h-4.5 text-yellow-500" /> TG thực hiện theo loại công việc (BU1)
-                      </h3>
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 flex items-center gap-2"><TrendingUp className="w-4.5 h-4.5 text-yellow-500" /> TG thực hiện theo loại công việc (BU1)</h3>
                       <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-1 rounded font-bold border border-gray-200">BU1</span>
                     </div>
                     <div className="h-[350px] w-full mt-2">
@@ -1244,30 +1081,20 @@
                             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
                             <XAxis dataKey="name" stroke="#6b7280" fontSize={11} tickLine={false} />
                             <YAxis stroke="#6b7280" fontSize={11} tickLine={false} />
-                            <Tooltip 
-                              contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb', borderRadius: '8px', color: '#111827', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                              formatter={(value, name) => value > 0 ? [`${value} giờ`, name] : [null, null]}
-                            />
+                            <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb', borderRadius: '8px', color: '#111827', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} formatter={(value, name) => value > 0 ? [`${value} giờ`, name] : [null, null]} />
                             <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-                            {TASK_CATEGORIES.map((category, idx) => (
-                              <Bar key={category} dataKey={category} stackId="a" fill={TASK_COLORS[idx % TASK_COLORS.length]} />
-                            ))}
+                            {TASK_CATEGORIES.map((category, idx) => <Bar key={category} dataKey={category} stackId="a" fill={TASK_COLORS[idx % TASK_COLORS.length]} />)}
                           </BarChart>
                         </ResponsiveContainer>
                       ) : (
-                        <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2">
-                          <TrendingUp className="w-8 h-8 opacity-30" />
-                          <p className="text-sm">Không có dữ liệu của BU1</p>
-                        </div>
+                        <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2"><TrendingUp className="w-8 h-8 opacity-30" /><p className="text-sm">Không có dữ liệu của BU1</p></div>
                       )}
                     </div>
                   </div>
 
                   <div className="bg-white p-6 rounded-2xl border border-gray-200 flex flex-col shadow-sm">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 flex items-center gap-2">
-                        <TrendingUp className="w-4.5 h-4.5 text-yellow-500" /> TG thực hiện theo loại công việc (BU2)
-                      </h3>
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 flex items-center gap-2"><TrendingUp className="w-4.5 h-4.5 text-yellow-500" /> TG thực hiện theo loại công việc (BU2)</h3>
                       <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-1 rounded font-bold border border-gray-200">BU2</span>
                     </div>
                     <div className="h-[350px] w-full mt-2">
@@ -1277,21 +1104,13 @@
                             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
                             <XAxis dataKey="name" stroke="#6b7280" fontSize={11} tickLine={false} />
                             <YAxis stroke="#6b7280" fontSize={11} tickLine={false} />
-                            <Tooltip 
-                              contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb', borderRadius: '8px', color: '#111827', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                              formatter={(value, name) => value > 0 ? [`${value} giờ`, name] : [null, null]}
-                            />
+                            <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb', borderRadius: '8px', color: '#111827', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} formatter={(value, name) => value > 0 ? [`${value} giờ`, name] : [null, null]} />
                             <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-                            {TASK_CATEGORIES.map((category, idx) => (
-                              <Bar key={category} dataKey={category} stackId="a" fill={TASK_COLORS[idx % TASK_COLORS.length]} />
-                            ))}
+                            {TASK_CATEGORIES.map((category, idx) => <Bar key={category} dataKey={category} stackId="a" fill={TASK_COLORS[idx % TASK_COLORS.length]} />)}
                           </BarChart>
                         </ResponsiveContainer>
                       ) : (
-                        <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2">
-                          <TrendingUp className="w-8 h-8 opacity-30" />
-                          <p className="text-sm">Không có dữ liệu của BU2</p>
-                        </div>
+                        <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2"><TrendingUp className="w-8 h-8 opacity-30" /><p className="text-sm">Không có dữ liệu của BU2</p></div>
                       )}
                     </div>
                   </div>
@@ -1319,7 +1138,7 @@
                 <form onSubmit={handleSubmitTimeLogs} className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
                   <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-50">
                     <span className="text-sm font-bold uppercase tracking-wider text-gray-900 flex items-center gap-2"><Calendar className="w-4.5 h-4.5 text-yellow-500" /> Bảng Chấm Công Tuần: {trackerWeek.split('-W')[1]} ({getWeekRange(trackerWeek)})</span>
-                    <div className="text-xs text-yellow-700 bg-yellow-100 border border-yellow-200 px-3 py-1.5 rounded-lg shadow-sm">Nhân sự: <span className="font-bold">{users.find(u => u.id === currentUser)?.name}</span></div>
+                    <div className="text-xs text-yellow-700 bg-yellow-100 border border-yellow-200 px-3 py-1.5 rounded-lg shadow-sm">Nhân sự: <span className="font-bold">{users.find(u => u.id === currentUser)?.name || "Chưa chọn"}</span></div>
                   </div>
                   <div className="p-5 overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[1000px]">
@@ -1345,7 +1164,12 @@
                           return (
                             <tr key={index} className="hover:bg-gray-50 transition-colors">
                               <td className="py-3 px-1 text-center"><span className="text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded w-full block truncate">{selectedProjObj ? selectedProjObj.bu : "-"}</span></td>
-                              <td className="py-3 px-1"><select value={row.projectId} onChange={(e) => { handleTrackerValueChange(index, 'projectId', e.target.value); handleTrackerValueChange(index, 'serviceName', ''); }} className="w-full text-xs px-2 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 cursor-pointer"><option value="">-- Chọn dự án --</option>{projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></td>
+                              <td className="py-3 px-1">
+                                <select value={row.projectId} onChange={(e) => { handleTrackerValueChange(index, 'projectId', e.target.value); handleTrackerValueChange(index, 'serviceName', ''); }} className="w-full text-xs px-2 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 cursor-pointer">
+                                  <option value="">-- Chọn dự án --</option>
+                                  {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                </select>
+                              </td>
                               <td className="py-3 px-1"><select value={row.serviceName} onChange={(e) => handleTrackerValueChange(index, 'serviceName', e.target.value)} className="w-full text-xs px-2 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 cursor-pointer"><option value="">-- Loại dịch vụ --</option>{projectServices.map((srv, idx) => <option key={idx} value={srv}>{srv}</option>)}</select></td>
                               <td className="py-3 px-1"><select value={row.desc} onChange={(e) => handleTrackerValueChange(index, 'desc', e.target.value)} className="w-full text-xs px-2 py-2 bg-white border border-gray-300 rounded-lg text-yellow-600 font-semibold focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 cursor-pointer"><option value="">-- Chọn loại --</option>{TASK_CATEGORIES.map(category => <option key={category} value={category}>{category}</option>)}</select></td>
                               {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(day => (
@@ -1399,35 +1223,51 @@
               </div>
             )}
 
-            {/* ======================= TAB 3: XUẤT EXCEL ======================= */}
+            {/* ======================= TAB 3: XUẤT EXCEL & CHI TIẾT DỮ LIỆU ======================= */}
             {activeTab === 'report' && (
               <div className="space-y-6">
                 <div className="bg-white p-5 rounded-2xl border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm">
                   <div>
-                    <h3 className="text-base font-bold text-gray-900 flex items-center gap-2"><FileSpreadsheet className="w-5 h-5 text-yellow-500" /> Bảng kê dữ liệu và đóng góp chi tiết</h3>
-                    <p className="text-xs text-gray-500 mt-1">Đã áp dụng bộ lọc hiện tại ở tab Báo Cáo Tổng Hợp ({filteredLogs.length} dòng nhật ký được tìm thấy)</p>
+                    <h3 className="text-base font-bold text-gray-900 flex items-center gap-2"><FileSpreadsheet className="w-5 h-5 text-yellow-500" /> Bảng kê dữ liệu và xuất file</h3>
+                    <p className="text-xs text-gray-500 mt-1">Hiển thị {reportFilteredLogs.length} dòng nhật ký. Bạn có thể thiết lập bộ lọc theo thời gian tùy chỉnh dưới đây.</p>
                   </div>
-                  <div className="flex gap-3 w-full md:w-auto"><button onClick={exportToExcel} className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer"><Download className="w-4.5 h-4.5" /> Xuất File Báo Cáo Excel (.xlsx)</button></div>
+                  <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
+                    <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-200">
+                      <span className="text-xs text-gray-500 font-semibold">Từ:</span>
+                      <input type="date" value={reportFromDate} onChange={(e) => setReportFromDate(e.target.value)} className="bg-white border border-gray-300 rounded-md px-2 py-1 text-xs text-gray-900 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500" />
+                      <span className="text-xs text-gray-500 font-semibold">Đến:</span>
+                      <input type="date" value={reportToDate} onChange={(e) => setReportToDate(e.target.value)} className="bg-white border border-gray-300 rounded-md px-2 py-1 text-xs text-gray-900 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500" />
+                    </div>
+                    <button onClick={exportToExcel} className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer"><Download className="w-4.5 h-4.5" /> Xuất File Excel</button>
+                  </div>
                 </div>
 
                 <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
                   <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-                    <span className="text-xs font-bold uppercase tracking-wider text-gray-900">Nhật Ký Log Giờ Công Việc Chi Tiết</span>
-                    <span className="text-xs text-gray-500 font-medium">Tổng cộng giờ đang hiển thị: <strong className="text-yellow-600 text-sm font-extrabold">{totalHoursFiltered}h</strong></span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-gray-900">Nhật Ký Log Giờ Chi Tiết</span>
+                    <span className="text-xs text-gray-500 font-medium">Tổng cộng giờ đang hiển thị: <strong className="text-yellow-600 text-sm font-extrabold">{reportTotalHoursFiltered}h</strong></span>
                   </div>
                   <div className="overflow-x-auto">
-                    {filteredLogs.length > 0 ? (
-                      <table className="w-full text-left border-collapse">
+                    {reportFilteredLogs.length > 0 ? (
+                      <table className="w-full text-left border-collapse min-w-[1000px]">
                         <thead>
                           <tr className="border-b border-gray-200 text-gray-500 text-xs font-semibold uppercase bg-gray-50">
-                            <th className="py-3 px-4">Ngày</th><th className="py-3 px-4">Nhân sự</th><th className="py-3 px-4">BU</th><th className="py-3 px-4">Dự án</th><th className="py-3 px-4">Dịch vụ Martech</th><th className="py-3 px-4">Loại Công Việc</th><th className="py-3 px-4 text-center">Thời gian</th><th className="py-3 px-4">% Đóng góp</th>
+                            <th className="py-3 px-4 w-[10%]">Ngày</th>
+                            <th className="py-3 px-4 w-[15%]">Nhân sự</th>
+                            <th className="py-3 px-4 w-[5%]">BU</th>
+                            <th className="py-3 px-4 w-[25%]">Dự án</th>
+                            <th className="py-3 px-4 w-[15%]">Dịch vụ Martech</th>
+                            <th className="py-3 px-4 w-[15%]">Loại Công Việc</th>
+                            <th className="py-3 px-4 text-center w-[5%]">Thời gian</th>
+                            <th className="py-3 px-4 text-center w-[5%]">%</th>
+                            <th className="py-3 px-4 text-center w-[5%]">Thao tác</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 text-xs">
-                          {filteredLogs.map(log => {
+                          {reportFilteredLogs.map(log => {
                             const userObj = users.find(u => u.id === log.userId);
                             const projObj = projects.find(p => p.id === log.projectId);
-                            const contribPercent = totalHoursFiltered > 0 ? ((log.hours / totalHoursFiltered) * 100).toFixed(2) : 0;
+                            const contribPercent = reportTotalHoursFiltered > 0 ? ((log.hours / reportTotalHoursFiltered) * 100).toFixed(2) : 0;
                             return (
                               <tr key={log.id} className="hover:bg-gray-50 transition-colors">
                                 <td className="py-3 px-4 font-semibold text-gray-500 whitespace-nowrap">{log.date}</td>
@@ -1438,13 +1278,18 @@
                                 <td className="py-3 px-4 text-gray-700 font-semibold">{log.description}</td>
                                 <td className="py-3 px-4 text-center font-bold text-gray-900 text-sm whitespace-nowrap bg-gray-50">{log.hours}h</td>
                                 <td className="py-3 px-4 text-center text-yellow-600 font-semibold">{contribPercent}%</td>
+                                <td className="py-3 px-4 text-center">
+                                  <button onClick={() => handleDeleteLog(log.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer" title="Xóa dòng nhật ký này">
+                                    <Trash2 className="w-4.5 h-4.5" />
+                                  </button>
+                                </td>
                               </tr>
                             );
                           })}
                         </tbody>
                       </table>
                     ) : (
-                      <div className="p-10 text-center text-gray-500 flex flex-col items-center justify-center gap-2"><FileSpreadsheet className="w-10 h-10 opacity-30" /><span>Không có bản ghi log giờ nào khớp với bộ lọc đã chọn ở trên</span></div>
+                      <div className="p-10 text-center text-gray-500 flex flex-col items-center justify-center gap-2"><FileSpreadsheet className="w-10 h-10 opacity-30" /><span>Không tìm thấy dữ liệu hoặc chưa có dữ liệu.</span></div>
                     )}
                   </div>
                 </div>
@@ -1482,12 +1327,12 @@
                       <div>
                         <label className="block text-xs text-gray-500 mb-1.5 font-medium uppercase tracking-wider">Chọn nhân sự tham gia dự án</label>
                         <div className="grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-xl border border-gray-200 max-h-[140px] overflow-y-auto">
-                          {users.map(u => (
+                          {users.length > 0 ? users.map(u => (
                             <label key={u.id} className="flex items-center gap-2 text-xs text-gray-700 hover:text-gray-900 cursor-pointer py-0.5">
                               <input type="checkbox" checked={newProjectMembers.includes(u.id)} onChange={() => toggleMemberSelection(u.id)} className="rounded bg-white border-gray-300 text-yellow-500 focus:ring-yellow-500 w-3.5 h-3.5" />
                               <span>{u.name} ({u.role})</span>
                             </label>
-                          ))}
+                          )) : <div className="text-xs text-gray-400 col-span-2 italic">Chưa có nhân sự nào.</div>}
                         </div>
                       </div>
                       <div>
@@ -1566,7 +1411,7 @@
                   <div className="bg-white p-6 rounded-2xl border border-gray-200 flex flex-col shadow-sm space-y-4">
                     <h3 className="text-base font-bold text-gray-900 flex items-center gap-2 border-b border-gray-100 pb-3"><Users className="w-5 h-5 text-gray-400" /> Danh Sách Nhân Sự Hiện Tại ({users.length})</h3>
                     <div className="overflow-y-auto max-h-[300px] pr-2 space-y-2 scrollbar-thin scrollbar-thumb-gray-300">
-                      {users.map(u => (
+                      {users.length > 0 ? users.map(u => (
                         <div key={u.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-200">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-yellow-600 font-bold border border-gray-200 shadow-sm">{u.name.charAt(0)}</div>
@@ -1574,7 +1419,7 @@
                           </div>
                           <span className="text-[10px] bg-yellow-100 text-yellow-700 border border-yellow-200 px-2.5 py-1 rounded-md font-semibold">{u.role}</span>
                         </div>
-                      ))}
+                      )) : <div className="text-xs text-gray-400 text-center mt-4">Hệ thống chưa có dữ liệu nhân sự.</div>}
                     </div>
                   </div>
                 </div>
@@ -1582,7 +1427,7 @@
                 <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                   <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4 flex items-center gap-2"><Briefcase className="w-4.5 h-4.5 text-yellow-500" /> Danh sách dự án Martech hệ thống đang vận hành ({projects.length})</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {projects.map(proj => (
+                    {projects.length > 0 ? projects.map(proj => (
                       <div key={proj.id} className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col justify-between space-y-3">
                         <div>
                           <div className="flex justify-between items-start">
@@ -1621,7 +1466,7 @@
                           </div>
                         </div>
                       </div>
-                    ))}
+                    )) : <div className="text-xs text-gray-400 text-center col-span-2">Hệ thống chưa có dự án nào được tạo.</div>}
                   </div>
                 </div>
               </div>
@@ -1631,7 +1476,7 @@
           {/* Footer */}
           <footer className="bg-white border-t border-gray-200 py-4 px-6 text-center text-xs text-gray-500">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-              <span>&copy; 2026 aka MARTECH AGENCY - Dashboard Quản Lý & Chấm Công Dự Án Toàn Diện</span>
+              <span>&copy; 2026 AKA MARTECH AGENCY - Dashboard Quản Lý & Chấm Công Dự Án Toàn Diện</span>
               <span className="text-yellow-600 font-semibold">Cộng tác cùng đội ngũ Martech Engineers</span>
             </div>
           </footer>
